@@ -13,68 +13,78 @@ class Game {
         this.player2 = player2;
         this.board = new chess_js_1.Chess();
         this.moves = [];
+        this.moveCount = 0;
         this.startTime = new Date();
         this.player1.send(JSON.stringify({
             type: message_1.INIT_GAME,
             payload: {
-                color: "white"
-            }
+                color: "white",
+            },
         }));
         this.player2.send(JSON.stringify({
             type: message_1.INIT_GAME,
             payload: {
-                color: "black"
-            }
+                color: "black",
+            },
         }));
     }
     makeMove(socket, move) {
         //validation here is it user1 move
         //push the move
-        //check if game is over 
-        //update the board 
+        //check if game is over
+        //update the board
         //send the updated borad to the both users
-        if (this.player1 == socket) {
+        try {
+            if (this.moveCount % 2 === 0 && socket != this.player1) {
+                console.log("coming");
+                return;
+            }
+            if (this.moveCount % 2 === 1 && socket != this.player2) {
+                console.log("coming ,here");
+                return;
+            }
             try {
-                const isValid = this.board.move(move);
-                if (isValid) {
-                    this.moves.push(move);
-                    console.log(this.board.ascii());
-                    console.log(this.moves);
-                    if (!this.board.isGameOver()) {
-                        socket.send("valid move");
-                    }
-                    socket.send("valid move");
-                }
-                else {
-                    console.log("Invalid move");
-                    socket.send("invalid move"); // Send feedback for invalid move
-                }
+                this.board.move(move);
+                console.log("coming3");
             }
-            catch (error) {
-                console.error("Error during move:", error);
-                socket.send("Error: Invalid move"); // Notify client of the error
+            catch (e) {
+                console.log(e);
+                return;
             }
+            this.moves.push(move);
+            console.log(this.board.ascii());
+            if (this.board.isGameOver()) {
+                this.player1.send(JSON.stringify({
+                    type: message_1.GAME_OVER,
+                    payload: {
+                        winner: this.board.turn() === "w" ? "black" : "white",
+                    },
+                }));
+                this.player2.send(JSON.stringify({
+                    type: message_1.GAME_OVER,
+                    payload: {
+                        winner: this.board.turn() === "w" ? "black" : "white",
+                    },
+                }));
+            }
+            if (this.moveCount % 2 === 0) {
+                console.log("coming4");
+                this.player2.send(JSON.stringify({
+                    type: message_1.MOVE,
+                    payload: move,
+                }));
+            }
+            if (this.moveCount % 2 === 1) {
+                this.player1.send(JSON.stringify({
+                    type: message_1.MOVE,
+                    payload: move,
+                }));
+            }
+            this.moveCount++;
         }
-        else {
-            try {
-                const isValid = this.board.move(move);
-                if (isValid) {
-                    console.log(this.board.ascii());
-                    console.log(this.moves);
-                    if (!this.board.isGameOver()) {
-                        socket.send("valid move");
-                        socket.CLOSED;
-                    }
-                }
-                else {
-                    console.log("Invalid move");
-                    socket.send("invalid move"); // Send feedback for invalid move
-                }
-            }
-            catch (error) {
-                console.error("Error during move:", error);
-                socket.send("Error: Invalid move"); // Notify client of the error
-            }
+        catch (e) {
+            console.log(e);
+            return;
         }
     }
 }

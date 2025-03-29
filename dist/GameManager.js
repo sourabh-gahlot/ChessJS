@@ -8,7 +8,6 @@ class GameManager {
         this.games = [];
         this.pendingUser = null;
         this.users = [];
-        this.color = "";
     }
     addUser(socket) {
         this.users.push(socket);
@@ -27,16 +26,13 @@ class GameManager {
             if (message.type == message_1.INIT_GAME) {
                 if (!this.pendingUser) {
                     this.pendingUser = socket;
-                    this.color = "Black";
-                    socket.send("waiting for another player...., your color is black");
+                    socket.send("waiting for another player....");
                 }
                 else {
                     const game = new Game_1.Game(this.pendingUser, socket);
                     this.games.push(game);
                     this.pendingUser = null;
-                    this.color = "White";
-                    console.log(this.games);
-                    socket.send("game has been started , your color is White");
+                    socket.send("game has been started");
                 }
             }
             if (message.type == message_1.MOVE) {

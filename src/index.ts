@@ -29,7 +29,6 @@ wss.on('connection', function connection(ws) {
   //     }
   // });
 
-  ws.send("e3, e4")
 
   
     ws.on('close', function() {

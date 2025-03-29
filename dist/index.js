@@ -22,7 +22,6 @@ wss.on('connection', function connection(ws) {
     //         console.error("Invalid JSON format:", error);
     //     }
     // });
-    ws.send("e3, e4");
     ws.on('close', function () {
         console.log("insidee");
     });

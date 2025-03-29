@@ -11,13 +11,13 @@ export class GameManager{
 
     private pendingUser:WebSocket | null;
 
-    private color:string
+
 
     constructor(){
         this.games=[];
         this.pendingUser=null
         this.users=[];
-        this.color="";
+      
     }
 
 
@@ -45,17 +45,14 @@ export class GameManager{
             if(message.type==INIT_GAME){
                 if(!this.pendingUser){
                     this.pendingUser=socket
-                    this.color="Black"
-                    socket.send("waiting for another player...., your color is black")
+                    socket.send("waiting for another player....")
                    
                 }
                 else{
                     const game=new Game(this.pendingUser,socket)
                     this.games.push(game)
                     this.pendingUser=null
-                    this.color="White"
-                    console.log(this.games)
-                    socket.send("game has been started , your color is White")
+                    socket.send("game has been started")
                 }
 
             }
